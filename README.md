@@ -42,7 +42,7 @@ create database commerce_db;
 
 DB連線資訊
 ```
-# application.properties
+application.properties
 
 spring.application.name=demo
 spring.datasource.url=jdbc:mysql://localhost:3306/commerce_db
