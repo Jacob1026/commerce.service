@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Segment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -31,6 +32,6 @@ public class Segment {
     private LocalDateTime deletedAt;
 
     //表示一個 Segment可以有多個 UserSegment
-    @OneToMany(mappedBy = "segment")
+    @OneToMany(mappedBy = "segment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserSegment> userSegments;
 }
