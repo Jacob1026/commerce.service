@@ -12,7 +12,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-//插建
+//Lombok插建不用寫getter setter toString
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -34,7 +34,6 @@ public class UserSegment {
     private LocalDateTime deletedAt;
 }
 /*
-
 複合主鍵寫法
 @Entity
 @Table(name = "user_segments")
