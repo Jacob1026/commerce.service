@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -61,8 +62,9 @@ public class User {
 
     @Column(name ="delete_at")
     private LocalDateTime deletedAt;
-
-
+//表示一個 User可以有多個 UserSegment
+    @OneToMany(mappedBy = "user")
+    private List<UserSegment> userSegments;
 }
 
 

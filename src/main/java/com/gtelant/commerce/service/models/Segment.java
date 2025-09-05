@@ -30,6 +30,7 @@ public class Segment {
     @Column (name ="deleted_at")
     private LocalDateTime deletedAt;
 
+    //表示一個 Segment可以有多個 UserSegment
     @OneToMany(mappedBy = "segment")
     private List<UserSegment> userSegments;
 }
