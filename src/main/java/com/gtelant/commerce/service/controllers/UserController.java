@@ -39,10 +39,12 @@ public class UserController {
 
     @Operation(summary = "使用者分頁", description = "限制一次查詢設定筆數的使用者資料")
     @GetMapping("/page")
+    //設定預設值page=1, size=10
     public List<UserResponse> getAllUsersPage(@RequestParam(defaultValue = "1") int page, //第幾頁
                                               @RequestParam(defaultValue = "10") int size)//每頁幾筆
     {
-        PageRequest pageRequest = PageRequest.of(page, size);
+        //Spring Data JPA 頁碼是從0開始，所以要-1
+        PageRequest pageRequest = PageRequest.of(page-1, size);
         return userService.getAllUsersPage(pageRequest).stream()
                 .map(userMapper::toUserResponse)
                 .toList();
