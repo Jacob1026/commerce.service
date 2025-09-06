@@ -5,6 +5,8 @@ import com.gtelant.commerce.service.repositories.SegmentRepository;
 import com.gtelant.commerce.service.repositories.UserRepository;
 import com.gtelant.commerce.service.repositories.UserSegmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +31,10 @@ public class UserService {
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+//分頁，要求型態為Page
+    public Page<User> getAllUsersPage(PageRequest pageRequest) {
+        return userRepository.findAll(pageRequest);
     }
 
     public User getUserById(Integer id) {

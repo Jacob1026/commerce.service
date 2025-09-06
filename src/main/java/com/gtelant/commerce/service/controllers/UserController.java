@@ -7,9 +7,11 @@ import com.gtelant.commerce.service.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.print.Pageable;
 import java.util.List;
 
 @RestController
@@ -27,7 +29,6 @@ public class UserController {
         this.userMapper = userMapper;
     }
 
-
     @Operation(summary = "取得所有的使用者", description = "回傳list of all users")
     @GetMapping
     public List<UserResponse> getAllUsers() {
@@ -35,6 +36,18 @@ public class UserController {
                 .map(userMapper::toUserResponse)
                 .toList();
     }
+
+    @Operation(summary = "使用者分頁", description = "限制一次查詢設定筆數的使用者資料")
+    @GetMapping("/page")
+    public List<UserResponse> getAllUsersPage(@RequestParam(defaultValue = "1") int page, //第幾頁
+                                              @RequestParam(defaultValue = "10") int size)//每頁幾筆
+    {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return userService.getAllUsersPage(pageRequest).stream()
+                .map(userMapper::toUserResponse)
+                .toList();
+    }
+
     @Operation(summary = "用ID去找使用者", description = "回傳list of all users")
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse>getUserById(@PathVariable int id){
@@ -46,6 +59,7 @@ public class UserController {
         UserResponse dto = userMapper.toUserResponse(user);
         return ResponseEntity.ok(dto);
     }
+
     @Operation(summary = "新增使用者", description = "新增使用者")
     @PostMapping
     public ResponseEntity<UserResponse>createUser(@RequestBody UserRequest userRequest){
@@ -54,6 +68,8 @@ public class UserController {
         UserResponse dto = userMapper.toUserResponse(createdUser);
         return ResponseEntity.ok(dto);
     }
+
+
     @Operation(summary = "刪除用者", description = "刪除使用者")
     @DeleteMapping
     public ResponseEntity<Void>deleteUser(@PathVariable int id){
