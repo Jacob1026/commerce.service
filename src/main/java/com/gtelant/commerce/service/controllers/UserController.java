@@ -46,6 +46,7 @@ public class UserController {
         UserResponse dto = userMapper.toUserResponse(user);
         return ResponseEntity.ok(dto);
     }
+    @Operation(summary = "新增使用者", description = "新增使用者")
     @PostMapping
     public ResponseEntity<UserResponse>createUser(@RequestBody UserRequest userRequest){
         User user = userMapper.toUser(userRequest);
@@ -53,6 +54,7 @@ public class UserController {
         UserResponse dto = userMapper.toUserResponse(createdUser);
         return ResponseEntity.ok(dto);
     }
+    @Operation(summary = "刪除用者", description = "刪除使用者")
     @DeleteMapping
     public ResponseEntity<Void>deleteUser(@PathVariable int id){
         boolean deleted = userService.deleteUser(id);
