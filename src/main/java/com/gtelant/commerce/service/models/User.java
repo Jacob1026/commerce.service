@@ -55,7 +55,7 @@ public class User {
     private boolean hasSubscribe;
 
     @Column(name ="last_seen_at")
-    private String lastSeenAt;
+    private LocalDateTime lastSeenAt;
 
     @Column(name ="created_at")
     private LocalDateTime createdAt;
