@@ -22,9 +22,6 @@ public class Segment {
     @Column (name ="name")
     private String name;
 
-    @Column (name ="description")
-    private String description;
-
     @Column (name ="created_at")
     private LocalDateTime createdAt;
 

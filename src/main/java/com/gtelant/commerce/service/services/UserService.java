@@ -1,6 +1,8 @@
 package com.gtelant.commerce.service.services;
 
+import com.gtelant.commerce.service.models.Segment;
 import com.gtelant.commerce.service.models.User;
+import com.gtelant.commerce.service.models.UserSegment;
 import com.gtelant.commerce.service.repositories.SegmentRepository;
 import com.gtelant.commerce.service.repositories.UserRepository;
 import com.gtelant.commerce.service.repositories.UserSegmentRepository;
@@ -10,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -56,4 +59,19 @@ public class UserService {
         return false;
     }
 
+    //新增使用者到某個Segment
+    public UserSegment addUserToSegment(int id, int segmentId) {
+        Optional<User> user = userRepository.findById(id);
+        Optional<Segment> segment = segmentRepository.findById(segmentId);
+
+        if (user.isPresent() && segment.isPresent()) {
+            UserSegment userSegment = new UserSegment();
+            userSegment.setUser(user.get());
+            userSegment.setSegment(segment.get());
+            userSegment.setCreatedAt(java.time.LocalDateTime.now());
+            userSegmentRepository.save(userSegment);
+            return null;
+        }
+        return null;
+    }
 }

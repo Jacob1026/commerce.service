@@ -1,8 +1,10 @@
 package com.gtelant.commerce.service.controllers;
 import com.gtelant.commerce.service.dtos.UserRequest;
+import com.gtelant.commerce.service.dtos.UserSegmentResponse;
 import com.gtelant.commerce.service.mappers.UserMapper;
 import com.gtelant.commerce.service.models.User;
 import com.gtelant.commerce.service.dtos.UserResponse;
+import com.gtelant.commerce.service.models.UserSegment;
 import com.gtelant.commerce.service.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,9 +22,10 @@ import java.util.List;
 @Tag(name = "User", description = "User management APIs")
 public class UserController {
 
-//注入service和mapper
+    //注入service和mapper
     private final UserService userService;
     private final UserMapper userMapper;
+
     @Autowired
     public UserController(UserService userService, UserMapper userMapper) {
         this.userService = userService;
@@ -37,25 +40,25 @@ public class UserController {
                 .toList();
     }
 
-    @Operation(summary = "使用者分頁", description = "限制一次查詢設定筆數的使用者資料")
+    @Operation(summary = "使用者分頁", description = "從第1頁開始，每頁10筆")
     @GetMapping("/page")
     //設定預設值page=1, size=10
     public List<UserResponse> getAllUsersPage(@RequestParam(defaultValue = "1") int page, //第幾頁
                                               @RequestParam(defaultValue = "10") int size)//每頁幾筆
     {
         //Spring Data JPA 頁碼是從0開始，所以要-1
-        PageRequest pageRequest = PageRequest.of(page-1, size);
+        PageRequest pageRequest = PageRequest.of(page - 1, size);
         return userService.getAllUsersPage(pageRequest).stream()
                 .map(userMapper::toUserResponse)
                 .toList();
     }
 
-    @Operation(summary = "用ID去找使用者", description = "回傳list of all users")
+    @Operation(summary = "用ID去找使用者", description = "用ID去找使用者")
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse>getUserById(@PathVariable int id){
+    public ResponseEntity<UserResponse> getUserById(@PathVariable int id) {
         User user = userService.getUserById(id);
         //找不到使用者
-        if(user == null){
+        if (user == null) {
             return ResponseEntity.notFound().build();
         }
         UserResponse dto = userMapper.toUserResponse(user);
@@ -64,7 +67,7 @@ public class UserController {
 
     @Operation(summary = "新增使用者", description = "新增使用者")
     @PostMapping
-    public ResponseEntity<UserResponse>createUser(@RequestBody UserRequest userRequest){
+    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest userRequest) {
         User user = userMapper.toUser(userRequest);
         User createdUser = userService.createUser(user);
         UserResponse dto = userMapper.toUserResponse(createdUser);
@@ -74,13 +77,25 @@ public class UserController {
 
     @Operation(summary = "刪除用者", description = "刪除使用者")
     @DeleteMapping
-    public ResponseEntity<Void>deleteUser(@PathVariable int id){
+    public ResponseEntity<Void> deleteUser(@PathVariable int id) {
         boolean deleted = userService.deleteUser(id);
         //刪除失敗
-        if(!deleted){
+        if (!deleted) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.noContent().build();
     }
 
+
+    @Operation(summary = "新增使用者標籤", description = "用ID，新增使用者標籤")
+    @PostMapping(" /{id}/segments/{segmentId} ")
+   public ResponseEntity<UserSegmentResponse> addUserToSegment(@PathVariable int id, @PathVariable int segmentId) {
+        UserSegment userSegment = userService.addUserToSegment(id, segmentId);
+        if (userSegment == null) {
+            return ResponseEntity.notFound().build();
+        }
+        UserSegmentResponse dto = userMapper.toUserSegmentResponse(userSegment);
+        return ResponseEntity.ok(dto);
+    }
 }
+
