@@ -97,5 +97,18 @@ public class UserController {
         UserSegmentResponse dto = userMapper.toUserSegmentResponse(userSegment);
         return ResponseEntity.ok(dto);
     }
+
+    @Operation(summary = "用 userId 查詢使用者的 segment", description = "回傳該使用者所有的 segment 標籤")
+    @GetMapping("/{userId}/segments")
+    public ResponseEntity<List<UserSegmentResponse>> getUserSegmentsByUserId(@PathVariable int userId) {
+        List<UserSegment> segments = userService.getUserSegmentsByUserId(userId);
+        if (segments == null || segments.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        List<UserSegmentResponse> dtoList = segments.stream()
+                .map(userMapper::toUserSegmentResponse)
+                .toList();
+        return ResponseEntity.ok(dtoList);
+    }
 }
 

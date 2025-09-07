@@ -74,4 +74,8 @@ public class UserService {
         }
         return null;
     }
+
+    public List<UserSegment> getUserSegmentsByUserId(int userId) {
+        return userSegmentRepository.findByUserId(userId);
+    }
 }
