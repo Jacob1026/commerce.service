@@ -18,6 +18,7 @@ public class UserSegment {
     private int id;
 
     //外來鍵，來自user
+    //@JasonBackReference 子，避免無限遞迴
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;

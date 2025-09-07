@@ -29,6 +29,7 @@ public class Segment {
     private LocalDateTime deletedAt;
 
     //表示一個 Segment可以有多個 UserSegment
+    //@JsonManagedReference 父，避免無限遞迴
     @OneToMany(mappedBy = "segment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserSegment> userSegments;
 }

@@ -66,6 +66,7 @@ public class User {
 //cascade = CascadeType.ALL 代表對 User 物件做的所有操作（新增、刪除、更新）都會自動套用到關聯的 UserSegment 物件。
 //fetch = FetchType.LAZY 代表查詢 User 時，不會馬上載入 userSegments
 // ，只有在真正用到 userSegments 時才會去資料庫抓資料（懶加載）,有關聯到其他表的可以使用。
+//@JsonBackReference：父 ，避免無限遞迴
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserSegment> userSegments;
 }
