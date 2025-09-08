@@ -12,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.awt.print.Pageable;
 import java.util.List;
 
 @RestController
@@ -44,11 +42,14 @@ public class UserController {
     @GetMapping("/page")
     //設定預設值page=1, size=10
     public List<UserResponse> getAllUsersPage(@RequestParam(defaultValue = "1") int page, //第幾頁
-                                              @RequestParam(defaultValue = "10") int size)//每頁幾筆
+                                              @RequestParam(defaultValue = "10") int size,// 每頁幾筆
+                                              @RequestParam(defaultValue = "")String query,//搜尋關鍵字,預設值空字串
+                                              @RequestParam(required = false)Boolean hasSubscribe,//是否訂閱,大寫Boolean預設值null
+                                              @RequestParam(required = false)Integer segmentId)//標籤ID,預設值null
     {
         //Spring Data JPA 頁碼是從0開始，所以要-1
         PageRequest pageRequest = PageRequest.of(page - 1, size);
-        return userService.getAllUsersPage(pageRequest).stream()
+        return userService.getAllUsersPage(query, hasSubscribe, segmentId, pageRequest).stream()
                 .map(userMapper::toUserResponse)
                 .toList();
     }
@@ -87,7 +88,7 @@ public class UserController {
     }
 
 
-    @Operation(summary = "新增使用者標籤", description = "用ID，新增使用者標籤")
+    @Operation(summary = "新增使用者標籤", description = "用id，新增使用者標籤")
     @PostMapping(" /{id}/segments/{segmentId} ")
    public ResponseEntity<UserSegmentResponse> addUserToSegment(@PathVariable int id, @PathVariable int segmentId) {
         UserSegment userSegment = userService.addUserToSegment(id, segmentId);
