@@ -38,7 +38,7 @@ public class UserController {
                 .toList();
     }
 
-    @Operation(summary = "使用者分頁", description = "從第1頁開始，每頁10筆")
+    @Operation(summary = "使用者分頁，條件查詢", description = "從第1頁開始，每頁10筆，關鍵字搜尋firstName或lastName，是否訂閱，標籤ID")
     @GetMapping("/page")
     //設定預設值page=1, size=10
     public List<UserResponse> getAllUsersPage(@RequestParam(defaultValue = "1") int page, //第幾頁

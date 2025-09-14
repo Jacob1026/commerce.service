@@ -21,11 +21,13 @@ public class UserSegment {
     //@JasonBackReference 子，避免無限遞迴
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    //關聯到User實體，不是int userId
     private User user;
 
     //外來鍵，來自segment
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "segment_id")
+    //關聯到Segment實體，不是int segmentId
     private Segment segment;
 
     @Column(name ="created_at")

@@ -30,11 +30,11 @@ public class UserService {
         this.segmentRepository = segmentRepository;
         this.userSegmentRepository = userSegmentRepository;
     }
-
+//新增使用者
     public User createUser(User user) {
         return userRepository.save(user);
     }
-
+//取得所有使用者
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -43,25 +43,26 @@ public class UserService {
         Specification<User> spec = userSpecification(query, hasSubscribe, segmentId);
         return userRepository.findAll(spec, pageRequest);
     }
-
-    private Specification<User> userSpecification(String queryName, Boolean hasNewsletter, Integer segmentId) {
+//多條件查詢
+    private Specification<User> userSpecification(String queryName, Boolean hasSubscribe, Integer segmentId) {
+        //Specification<User> 是一個函數式介面，可以用lambda表示法來實作
         return ((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // if predicates.size() = 3 how many "AND"? => 2
             //if predicates.size() = 8  how many "AND"? => 7
-
             if(queryName != null && !queryName.isEmpty()) {
                 predicates.add(criteriaBuilder.or(
                         criteriaBuilder.like(criteriaBuilder.lower(root.get("firstName")), "%"+ queryName.toLowerCase()+"%"),
                         criteriaBuilder.like(criteriaBuilder.lower(root.get("lastName")), "%"+ queryName.toLowerCase()+"%")
                 ));
             }
-            if(hasNewsletter != null) {
-                predicates.add(criteriaBuilder.equal(root.get("hasNewsletter"), hasNewsletter));
+            if(hasSubscribe != null) {
+                predicates.add(criteriaBuilder.equal(root.get("hasSubscribe"), hasSubscribe));
             }
 
             if(segmentId != null) {
-                Join<User , UserSegment> userUserSegmentJoin = root.join("userSegments");
+                //透過 Join 來連接 User 和 UserSegment資料表
+                Join<User , UserSegment> userUserSegmentJoin = root.join("userSegments");// userSegments
                 predicates.add(criteriaBuilder.equal(userUserSegmentJoin.get("segment").get("id"), segmentId));
 
                 //如果 userSegment有 屬性segmentId 則可以直接使用
@@ -69,18 +70,19 @@ public class UserService {
 
                 //如果欲查詢Segment參數為字串（name）=> segmentName
                 //predicates.add(criteriaBuilder.equal(userUserSegmentJoin.get("segment").get("name"), segmentName)
-            }
 
+                //
+            }
             Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
             return criteriaBuilder.and(predicateArray);
         });
     }
 
-
+//用ID去找使用者
     public User getUserById(Integer id) {
         return userRepository.findById(id).orElse(null);
     }
-
+//更新使用者
     public User updateUser(Integer id, User updatedUser) {
         if (userRepository.existsById(id)) {
             updatedUser.setId(id);
@@ -88,6 +90,7 @@ public class UserService {
         }
         return null;
     }
+//刪除使用者
     public boolean deleteUser(Integer id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
@@ -111,7 +114,7 @@ public class UserService {
         }
         return null;
     }
-
+//用 userId 查詢使用者的 segment
     public List<UserSegment> getUserSegmentsByUserId(int userId) {
         return userSegmentRepository.findByUserId(userId);
     }
