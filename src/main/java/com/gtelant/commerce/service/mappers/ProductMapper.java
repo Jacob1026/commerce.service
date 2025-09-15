@@ -19,11 +19,7 @@ public class ProductMapper {
         this.productImageMapper = productImageMapper;
     }
 
-    /**
-     * 將 Product Entity 轉換為 ProductResponse DTO
-     * @param product 資料庫實體
-     * @return 用於 API 回傳的 DTO
-     */
+
     public ProductResponse toProductResponse(Product product) {
         if (product == null) {
             return null;
@@ -57,18 +53,14 @@ public class ProductMapper {
         return dto;
     }
 
-    /**
-     * 將 ProductRequest DTO 轉換為 Product Entity
-     * @param dto 來自 API 請求的 DTO
-     * @return 準備寫入資料庫的實體
-     */
+
     public Product toProduct(ProductRequest dto) {
         if (dto == null) {
             return null;
         }
 
         Product product = new Product();
-        // 注意：這裡不設定 ID，因為是新增
+        //這裡不設定 ID，因為是新增
         product.setName(dto.getName());
         product.setDescription(dto.getDescription());
         product.setPrice(dto.getPrice());
@@ -76,9 +68,6 @@ public class ProductMapper {
         product.setWidth(dto.getWidth());
         product.setHeight(dto.getHeight());
         product.setStock(dto.getStock());
-
-        // 注意：Category 的關聯通常會在 Service 層處理，而不是在 Mapper
-
         return product;
     }
 }

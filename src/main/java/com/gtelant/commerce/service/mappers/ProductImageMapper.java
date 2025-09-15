@@ -6,9 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProductImageMapper {
 
-    /**
-     * 將 ProductImage Entity 轉換為 ProductImageResponse DTO
-     */
+
     public ProductImageResponse toProductImageResponse(ProductImage productImage) {
         if (productImage == null) {
             return null;

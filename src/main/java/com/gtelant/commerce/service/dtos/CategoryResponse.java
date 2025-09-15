@@ -13,8 +13,6 @@ public class CategoryResponse {
     private String name;
     private LocalDateTime createdAt;
     private LocalDateTime deletedAt;
+    private List<ProductSimpleResponse> products;
 
-    // 為了完整性，可以回傳該分類下的商品資訊
-    // 注意：這裡應該使用 ProductResponse DTO，而不是直接用 Product Entity
-    private List<ProductResponse> products;
 }

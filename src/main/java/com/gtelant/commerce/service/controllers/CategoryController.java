@@ -43,7 +43,7 @@ public class CategoryController {
     /**
      * Read - 根據 ID 查詢商品分類
      */
-    @Operation(summary = "用 ID 查詢分類", description = "取得指定 ID 的商品分類詳細資訊")
+    @Operation(summary = "用 ID 查詢分類", description = "取得指定 ID 的商品簡單資訊ID跟名字")
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable int id) {
         Category category = categoryService.getCategoryById(id);
