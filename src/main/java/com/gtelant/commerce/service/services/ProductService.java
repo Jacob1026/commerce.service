@@ -77,16 +77,11 @@ public class ProductService {
         return productRepository.findById(productId).orElse(null);
     }
 
-    /**
-     * 條件查詢與分頁
-     * @param name 關鍵字 (可選)
-     * @param categoryId 分類 ID (可選)
-     * @param pageable 分頁資訊
-     * @return 分頁後的商品列表
-     */
-    public Page<Product> searchProducts(String name, Integer categoryId, Pageable pageable) {
+    //條件查詢
+    public Page<Product> searchProducts(String name, Integer categoryId, Integer minstock, Integer maxstock, Pageable pageable) {
         Specification<Product> spec = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
+
             // 如果 name 存在且不為空，加入名稱模糊查詢
             if (name != null && !name.trim().isEmpty()) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + name + "%"));
@@ -94,6 +89,16 @@ public class ProductService {
             // 如果 categoryId 存在，加入分類查詢
             if (categoryId != null) {
                 predicates.add(criteriaBuilder.equal(root.get("category").get("id"), categoryId));
+            }
+            // 如果 maxstock 存在，加入「小於等於」的庫存查詢
+            if (maxstock != null) {
+                // WHERE stock >= minstock
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("stock"), minstock));
+            }
+            // 如果 minstock 存在，加入「大於等於」的庫存查詢
+            if (minstock!= null) {
+                // WHERE stock <= maxstock
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("stock"), maxstock));
             }
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
