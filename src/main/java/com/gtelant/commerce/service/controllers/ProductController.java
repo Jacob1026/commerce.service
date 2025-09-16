@@ -57,19 +57,19 @@ public class ProductController {
         return ResponseEntity.ok(dto);
     }
 
-    @Operation(summary = "商品列表、搜尋與分頁、庫存查詢", description = "可選填name或categoryId進行篩選、查詢庫存>=maxstock 或 <=minstock")
+    @Operation(summary = "商品列表、搜尋與分頁、庫存查詢", description = "可選填name或categoryId進行篩選、查詢庫存>=stockFrom 或 <=stockTo")
     @GetMapping("/page")
     public List<ProductResponse> searchProducts(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Integer categoryId,
-            @RequestParam(required = false) Integer minstock,
-            @RequestParam(required = false) Integer maxstock
+            @RequestParam(required = false) Integer stockFrom,
+            @RequestParam(required = false) Integer stockTo
     ) {
         // Spring Data JPA 的頁碼從 0 開始
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<Product> productPage = productService.searchProducts(name, categoryId, minstock, maxstock,pageable);
+        Page<Product> productPage = productService.searchProducts(name, categoryId, stockFrom,stockTo,pageable);
         return productPage.getContent().stream()
                 .map(productMapper::toProductResponse)
                 .toList();

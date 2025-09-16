@@ -78,7 +78,7 @@ public class ProductService {
     }
 
     //條件查詢
-    public Page<Product> searchProducts(String name, Integer categoryId, Integer minstock, Integer maxstock, Pageable pageable) {
+    public Page<Product> searchProducts(String name, Integer categoryId, Integer stockFrom, Integer stockTo, Pageable pageable) {
         Specification<Product> spec = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -90,16 +90,23 @@ public class ProductService {
             if (categoryId != null) {
                 predicates.add(criteriaBuilder.equal(root.get("category").get("id"), categoryId));
             }
-            // 如果 maxstock 存在，加入「小於等於」的庫存查詢
-            if (maxstock != null) {
-                // WHERE stock >= minstock
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("stock"), minstock));
+            //庫存查詢
+
+            if (stockFrom != null && stockTo == null) {
+                // WHERE stock >= stockFrom
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("stock"), stockFrom));
+
+            }else if (stockFrom == null && stockTo != null) {
+                // WHERE stock <= stockTo
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("stock"), stockTo));
+
+            } else if (stockFrom != null && stockTo != null) {
+                // WHERE stock >= stockFrom
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("stock"), stockFrom));
+                // WHERE stock <= stockTo
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("stock"), stockTo));
             }
-            // 如果 minstock 存在，加入「大於等於」的庫存查詢
-            if (minstock!= null) {
-                // WHERE stock <= maxstock
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("stock"), maxstock));
-            }
+
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
         return productRepository.findAll(spec, pageable);
