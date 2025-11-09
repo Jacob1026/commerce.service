@@ -2,19 +2,24 @@ package com.gtelant.commerce.service.controllers;
 
 import com.gtelant.commerce.service.dtos.ReviewRequest;
 import com.gtelant.commerce.service.dtos.ReviewResponse; // <-- 修改返回類型
+import com.gtelant.commerce.service.dtos.UpdateReviewStatusRequest;
+import com.gtelant.commerce.service.models.Review;
 import com.gtelant.commerce.service.services.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*; // 引入 @RequestBody
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/reviews")
 @CrossOrigin("*")
+@SecurityRequirement( name = "bearerAuth")
 @Tag(name = "Review", description = "Review management APIs")
 
 public class ReviewController {
@@ -48,4 +53,18 @@ public class ReviewController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "批次更新評論狀態", description = "用ID列表更新多筆評論的狀態")
+    @PutMapping("/status")
+    public ResponseEntity<List<ReviewResponse>> updateReviewStatus(@RequestBody UpdateReviewStatusRequest request) {
+        try {
+            // 1. 正確接收 Service 回傳的 DTO 列表
+            List<ReviewResponse> updatedReviewResponses = reviewService.updateStatusForIds(
+                    request.getIds(),
+                    request.getReviewStatus()
+            );
+            return ResponseEntity.ok(updatedReviewResponses);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

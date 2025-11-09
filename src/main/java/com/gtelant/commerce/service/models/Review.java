@@ -33,7 +33,8 @@ public class Review {
 
     @Column(name = "comment")
     private String comment;
-
+    // 使用 Enum 類型來表示評論狀態
+    //@Enumerated(EnumType.STRING)
     @Column(name = "review_status")
     private ReviewStatus reviewStatus;
 

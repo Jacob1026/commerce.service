@@ -44,7 +44,7 @@ public class ReviewService {
     @Transactional
     public ReviewResponse createReview(ReviewRequest request) {
         Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() ->  new RuntimeException ("找不到對應的商品，ID: " + request.getProductId()));
+                .orElseThrow(() -> new RuntimeException("找不到對應的商品，ID: " + request.getProductId()));
 
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("找不到對應的用戶，ID: " + request.getUserId()));
@@ -60,20 +60,21 @@ public class ReviewService {
         return reviewMapper.toReviewResponse(savedReview);
     }
 
-// 根據 ID 查詢評論
+    // 根據 ID 查詢評論
     @Transactional(readOnly = true)
     public ReviewResponse getReviewById(Integer id) {
         Review review = reviewRepository.findByIdWithProductAndUser(id)
-                .orElseThrow(() -> new RuntimeException ("找不到對應的評論，ID: " + id));
+                .orElseThrow(() -> new RuntimeException("找不到對應的評論，ID: " + id));
         return reviewMapper.toReviewResponse(review);
     }
-// 根據商品 ID 查詢評論，並支援分頁
+
+    // 根據商品 ID 查詢評論，並支援分頁
     @Transactional(readOnly = true)
     public Page<ReviewResponse> getReviewsByProductId(Integer productId, Pageable pageable) {
         if (!productRepository.existsById(productId)) {
             throw new RuntimeException("找不到對應的商品，ID: " + productId);
         }
-        Page<Review> reviewPage = reviewRepository.findById(productId,pageable);
+        Page<Review> reviewPage = reviewRepository.findById(productId, pageable);
         return reviewPage.map(reviewMapper::toReviewResponse);
     }
 
@@ -114,7 +115,6 @@ public class ReviewService {
             review.setUser(user);
             review.setCreatedAt(LocalDateTime.now());
             review.setReviewStatus(ReviewStatus.PENDING); // 預設為待審核狀態
-
             reviewsToSave.add(review);
         }
 
@@ -135,6 +135,25 @@ public class ReviewService {
         }
         // JpaRepository 提供了批次刪除的方法，效率比一個一個刪除好
         reviewRepository.deleteAllByIdInBatch(ids);
+    }
+
+    // 用ID列表更新多筆評論的狀態
+    @Transactional
+    public List<ReviewResponse> updateStatusForIds(List<Integer> ids, ReviewStatus newStatus) {
+        if (ids == null || ids.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<Review> reviews = reviewRepository.findAllById(ids);
+        if (reviews.isEmpty()) {
+            throw new RuntimeException("No reviews found for the provided IDs.");
+        }
+        for (Review review : reviews) {
+            review.setReviewStatus(newStatus);
+        }
+        List<Review> updatedReviews = reviewRepository.saveAll(reviews);
+        return updatedReviews.stream()
+                .map(reviewMapper::toReviewResponse)
+                .collect(Collectors.toList());
     }
 
 }

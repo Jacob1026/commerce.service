@@ -1,8 +1,10 @@
 package com.gtelant.commerce.service.dtos;
 
 import com.gtelant.commerce.service.enums.ReviewStatus;
+import com.gtelant.commerce.service.models.Review;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class ReviewResponse {
@@ -11,7 +13,6 @@ public class ReviewResponse {
     private ProductSimpleResponse product;
     private Integer rating;
     private String comment;
-    private ReviewStatus reviewStatus; // <-- 建議使用 Enum 型別而非 String
-    private LocalDateTime createdAt;
-    private LocalDateTime deletedAt; // <-- 欄位名稱建議改為 deletedAt
+    private ReviewStatus reviewStatus;
+    private LocalDateTime deletedAt;
 }

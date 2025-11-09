@@ -6,8 +6,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import java.util.Optional;
+
 // JpaSpecificationExecutor<User> 支援多條件查詢
 public interface UserRepository extends JpaRepository<User,Integer> , JpaSpecificationExecutor<User> {
     Page<User> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(String firstName, String lastName, Pageable pageable);
-
+    Optional<User> findByEmail(String email);
 }

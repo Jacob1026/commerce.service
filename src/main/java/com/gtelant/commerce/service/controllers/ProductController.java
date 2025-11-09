@@ -6,6 +6,7 @@ import com.gtelant.commerce.service.mappers.ProductMapper;
 import com.gtelant.commerce.service.models.Product;
 import com.gtelant.commerce.service.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/products")
 @CrossOrigin("*")
+@SecurityRequirement( name = "bearerAuth")
 @Tag(name = "Product", description = "Product management APIs")
 public class ProductController {
 

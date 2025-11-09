@@ -7,6 +7,7 @@ import com.gtelant.commerce.service.dtos.UserResponse;
 import com.gtelant.commerce.service.models.UserSegment;
 import com.gtelant.commerce.service.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @CrossOrigin("*")
+@SecurityRequirement( name = "bearerAuth")
 @Tag(name = "User", description = "User management APIs")
 public class UserController {
 

@@ -19,7 +19,6 @@ public class ReviewMapper {
         dto.setRating(review.getRating());
         dto.setComment(review.getComment());
         dto.setReviewStatus(review.getReviewStatus());
-        dto.setCreatedAt(review.getCreatedAt());
         dto.setDeletedAt(review.getDeletedAt());
 
         // 呼叫輔助方法來轉換關聯物件
@@ -59,7 +58,7 @@ public class ReviewMapper {
     public Review toReview(ReviewRequest request) {
         if (request == null) return null;
         Review review = new Review();
-        review.setRating(request.getRating()); // 修正: request.get() -> request.getRating()
+        review.setRating(request.getRating());
         review.setComment(request.getComment());
         return review;
     }

@@ -6,6 +6,7 @@ import com.gtelant.commerce.service.mappers.CategoryMapper;
 import com.gtelant.commerce.service.models.Category;
 import com.gtelant.commerce.service.services.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/categories") // API 的基礎路徑
 @CrossOrigin("*")
+@SecurityRequirement( name = "bearerAuth")
 @Tag(name = "Category", description = "Category management APIs")
 public class CategoryController {
 
