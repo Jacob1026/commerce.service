@@ -1,7 +1,6 @@
 package com.gtelant.commerce.service.configs;
 
-// import com.gtelant.commerce.service.models.User; // <-- 1. UserDetails 已足夠
-import com.gtelant.commerce.service.repositories.UserRepository;
+// import com.gtelant.commerce.service.repositories.UserRepository; // <-- **修正 #1: 移除**
 import com.gtelant.commerce.service.services.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -12,6 +11,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -19,12 +20,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
-//過濾請求的設定，賦予權限
 public class JwtAuthFilter extends OncePerRequestFilter {
+
     @Autowired
     private JwtService jwtService;
     @Autowired
-    private UserRepository userRepository;
+    private UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -35,7 +36,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        // 衛哨兵: 如果沒有 Token，直接跳過此過濾器，執行下一個
+        // 衛哨兵
         if(authHeader == null || !authHeader.startsWith("Bearer ")){
             filterChain.doFilter(request,response);
             return;
@@ -44,35 +45,30 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String jwtToken = authHeader.substring(7);
         String email = jwtService.getUserEmailFromToken(jwtToken);
 
-        // 如果 Token 有效 (email != null) 且 SecurityContext 中尚無使用者
         if(email != null && SecurityContextHolder.getContext().getAuthentication() == null){
 
-            // 8. 警告: 您的 'User' 類別必須實作 'UserDetails' 介面
-            UserDetails userDetails = this.userRepository.findByEmail(email)
-                    .orElse(null); // 如果 Token 中的用戶已不存在於資料庫
+            try {
 
-            if (userDetails != null) {
-                // 9. 呼叫我們在 JwtService 中建立的 isTokenValid
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
                 if(jwtService.isTokenValid(jwtToken, userDetails)){
 
-                    // 10. 建立 Spring Security 的 Authentication 物件
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
-                            null, // 我們使用 JWT，所以 credentials (密碼) 為 null
+                            null,
                             userDetails.getAuthorities()
                     );
-
-                    // 11. 將 request 的詳細資訊加入 authToken 中
                     authToken.setDetails(
                             new WebAuthenticationDetailsSource().buildDetails(request)
                     );
-
-                    // 12. 更新 SecurityContext
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
+
+            } catch (UsernameNotFoundException e) {
+                // 如果 Token 中的用戶在資料庫中找不到 (例如已被刪除)
+                // 我們什麼也不做，SecurityContext 保持為 null (未驗證)
+                // 這樣請求在後面就會被 Spring Security 擋下 (因為 .anyRequest().authenticated())
             }
         }
-        // 13. (重要!) 讓過濾器鏈繼續執行下去
         filterChain.doFilter(request,response);
     }
 }
