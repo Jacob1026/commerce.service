@@ -35,7 +35,10 @@ public class CategoryMapper {
         if(category.getProducts() == null){
             dto.setProducts(Collections.emptyList());
         } else {
-            List<ProductSimpleResponse> simpleResponse = category.getProducts().stream().map(this::toProductSimpleResponse).collect(Collectors.toList());
+            List<ProductSimpleResponse> simpleResponse = category.getProducts()
+                        .stream()
+                        .map(this::toProductSimpleResponse)
+                        .collect(Collectors.toList());
         }
         return dto;
     }

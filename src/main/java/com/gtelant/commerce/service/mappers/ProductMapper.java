@@ -24,7 +24,6 @@ public class ProductMapper {
         if (product == null) {
             return null;
         }
-
         ProductResponse dto = new ProductResponse();
         dto.setId(product.getId());
         dto.setName(product.getName());

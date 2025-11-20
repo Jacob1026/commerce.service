@@ -10,7 +10,8 @@
 
 資料庫 (Database): MySQL
 
-API 文件 (API Documentation): Swagger
+API 文件 (API Documentation): Swagger  
+
 
 ✨ 核心功能 (Features)
 本專案 API 系統將涵蓋以下四大模組：
@@ -51,3 +52,10 @@ spring.datasource.password=<password>
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 ```
+📚 API 文件 (API Documentation)
+本專案使用 Swagger 產生 API 文件。當專案啟動後，請開啟瀏覽器並造訪以下網址：
+
+http://localhost:8080/swagger-ui/index.html
+
+你將會看到所有 API 的列表、規格、以及可直接在線上測試的功能。
+

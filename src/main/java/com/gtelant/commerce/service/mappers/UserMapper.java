@@ -5,11 +5,12 @@ import com.gtelant.commerce.service.models.UserSegment;
 import com.gtelant.commerce.service.dtos.UserRequest;
 import com.gtelant.commerce.service.dtos.UserResponse;
 import com.gtelant.commerce.service.dtos.UserSegmentResponse;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import java.util.stream.Collectors;
 
 //統一管理DTO與Model的轉換
-@Controller
+@Component
 public class UserMapper {
     public UserResponse toUserResponse(User user) {
         UserResponse dto = new UserResponse();
