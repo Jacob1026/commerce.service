@@ -1,18 +1,17 @@
 package com.gtelant.commerce.service.configs;
 
-// import com.gtelant.commerce.service.repositories.UserRepository; // <-- **修正 #1: 移除**
 import com.gtelant.commerce.service.services.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j; // 建議引入 Lombok 的 Slf4j 來做紀錄
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -20,6 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
+@Slf4j //這個註解可以用 log.error()
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Autowired
@@ -34,41 +34,42 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
+        final String authHeader = request.getHeader("Authorization");
+        final String jwtToken;
+        final String email;
 
-        // 衛哨兵
-        if(authHeader == null || !authHeader.startsWith("Bearer ")){
-            filterChain.doFilter(request,response);
+        // 檢查 Authorization 標頭是否存在且格式正確
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
             return;
         }
 
-        String jwtToken = authHeader.substring(7);
-        String email = jwtService.getUserEmailFromToken(jwtToken);
-
-        if(email != null && SecurityContextHolder.getContext().getAuthentication() == null){
-
-            try {
-
+        try {
+            jwtToken = authHeader.substring(7);
+            email = jwtService.getUserEmailFromToken(jwtToken);
+            // email 不為空且尚未驗證
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                // 載入使用者詳細資訊
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
-                if(jwtService.isTokenValid(jwtToken, userDetails)){
-
+                // 驗證 JWT
+                if (jwtService.isTokenValid(jwtToken, userDetails)) {
+                    //
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
                             userDetails.getAuthorities()
                     );
+
                     authToken.setDetails(
                             new WebAuthenticationDetailsSource().buildDetails(request)
                     );
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
-
-            } catch (UsernameNotFoundException e) {
-                // 如果 Token 中的用戶在資料庫中找不到 (例如已被刪除)
-                // 我們什麼也不做，SecurityContext 保持為 null (未驗證)
-                // 這樣請求在後面就會被 Spring Security 擋下 (因為 .anyRequest().authenticated())
             }
+
+        } catch (Exception e) {
+            log.debug("JWT Authentication failed: {}", e.getMessage());
         }
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 }

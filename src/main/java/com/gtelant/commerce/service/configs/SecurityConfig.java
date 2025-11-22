@@ -22,12 +22,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
+                //關閉 CSRF 保護，因為我們使用的是 JWT
                 .csrf(AbstractHttpConfigurer::disable)
+                // 定義授權規則
                 .authorizeHttpRequests(authz -> authz
+                        //允許訪問的路徑
                         .requestMatchers("/jwt/**").permitAll()
                         .requestMatchers("/swagger-ui/**","/v3/api-docs/**").permitAll()
+                        //所有其他請求都需要身份驗證
                         .anyRequest().authenticated()
                 )
+                //設定無狀態的 session 管理
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -35,6 +40,7 @@ public class SecurityConfig {
     }
 
     @Bean
+    // 密碼加密器 Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
