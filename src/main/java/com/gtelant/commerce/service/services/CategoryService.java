@@ -1,12 +1,12 @@
 package com.gtelant.commerce.service.services;
 
+import com.gtelant.commerce.service.exceptions.ResourceNotFoundException; // 記得 import 你的異常類
 import com.gtelant.commerce.service.models.Category;
 import com.gtelant.commerce.service.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CategoryService {
@@ -30,27 +30,27 @@ public class CategoryService {
 
     // 用 ID 尋找分類
     public Category getCategoryById(Integer id) {
-        return categoryRepository.findById(id).orElse(null);
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("找不到該分類 ID: " + id));
     }
 
     // 更新分類
     public Category updateCategory(Integer id, Category categoryDetails) {
-        // First, check if the category with the given id exists.
-        if (categoryRepository.existsById(id)) {
-            // Set the ID on the new object to ensure we are updating the correct record.
-            categoryDetails.setId(id);
-            return categoryRepository.save(categoryDetails);
+        // 1. 檢查 ID 是否存在，不存在直接拋出異常
+        if (!categoryRepository.existsById(id)) {
+            throw new ResourceNotFoundException("無法更新，找不到該分類 ID: " + id);
         }
-        // Return null if the category was not found.
-        return null;
+
+        // 2. 設定 ID 並存檔 (直接覆蓋)
+        categoryDetails.setId(id);
+        return categoryRepository.save(categoryDetails);
     }
 
     // 刪除分類
-    public boolean deleteCategory(Integer id) {
-        if (categoryRepository.existsById(id)) {
-            categoryRepository.deleteById(id);
-            return true;
+    public void deleteCategory(Integer id) {
+        if (!categoryRepository.existsById(id)) {
+            throw new ResourceNotFoundException("無法刪除，找不到該分類 ID: " + id);
         }
-        return false;
+        categoryRepository.deleteById(id);
     }
 }
