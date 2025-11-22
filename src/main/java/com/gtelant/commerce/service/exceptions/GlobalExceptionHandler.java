@@ -46,10 +46,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResponse<Object>> handleBusinessException(BusinessException e) {
-        log.error("業務異常: {}", e.getMessage());
-        // 修正：業務異常通常是 400 Bad Request，Body code 也應對應 400
+        log.warn("業務異常: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error(e.getMessage(), 400));
+                .body(ApiResponse.error(e.getMessage(), e.getCode()));
     }
 
     /**

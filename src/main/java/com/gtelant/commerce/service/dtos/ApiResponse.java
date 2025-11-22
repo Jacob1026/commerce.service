@@ -15,7 +15,7 @@ public class ApiResponse <T>{
     private  int code;
 
 
-    public static <T> ApiResponse  <T> suceess(T data){
+    public static <T> ApiResponse  <T> success(T data){
         ApiResponse<T> response = new ApiResponse<>();
         response.setSuccess(true);
         response.setData(data);

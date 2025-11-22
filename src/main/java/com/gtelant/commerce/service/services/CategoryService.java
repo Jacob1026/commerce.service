@@ -1,10 +1,11 @@
 package com.gtelant.commerce.service.services;
 
-import com.gtelant.commerce.service.exceptions.ResourceNotFoundException; // 記得 import 你的異常類
+import com.gtelant.commerce.service.exceptions.ResourceNotFoundException;
 import com.gtelant.commerce.service.models.Category;
 import com.gtelant.commerce.service.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class CategoryService {
     }
 
     // 新增分類
+    @Transactional
     public Category createCategory(Category category) {
         return categoryRepository.save(category);
     }
@@ -35,18 +37,17 @@ public class CategoryService {
     }
 
     // 更新分類
+    @Transactional
     public Category updateCategory(Integer id, Category categoryDetails) {
-        // 1. 檢查 ID 是否存在，不存在直接拋出異常
-        if (!categoryRepository.existsById(id)) {
-            throw new ResourceNotFoundException("無法更新，找不到該分類 ID: " + id);
-        }
-
-        // 2. 設定 ID 並存檔 (直接覆蓋)
-        categoryDetails.setId(id);
-        return categoryRepository.save(categoryDetails);
+        // 1. 先撈出資料庫原本的資料 (如果找不到直接拋異常，不需要用 existsById 分開寫)
+        Category existingCategory = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("無法更新，找不到該分類 ID: " + id));
+        existingCategory.setName(categoryDetails.getName());
+        return categoryRepository.save(existingCategory);
     }
 
     // 刪除分類
+    @Transactional
     public void deleteCategory(Integer id) {
         if (!categoryRepository.existsById(id)) {
             throw new ResourceNotFoundException("無法刪除，找不到該分類 ID: " + id);
