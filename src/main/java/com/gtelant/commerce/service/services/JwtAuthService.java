@@ -3,21 +3,20 @@ package com.gtelant.commerce.service.services;
 import com.gtelant.commerce.service.dtos.LoginRequest;
 import com.gtelant.commerce.service.models.User;
 import com.gtelant.commerce.service.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-
+@RequiredArgsConstructor
 @Service
 public class JwtAuthService {
 
-    @Autowired
-    private  JwtService jwtService;
-    @Autowired
-    private  UserRepository userRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+
+    private final JwtService jwtService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public String registerUser(User user){
         // 檢查用戶是否已存在

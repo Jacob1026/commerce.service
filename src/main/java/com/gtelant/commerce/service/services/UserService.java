@@ -8,6 +8,7 @@ import com.gtelant.commerce.service.repositories.UserRepository;
 import com.gtelant.commerce.service.repositories.UserSegmentRepository;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+@RequiredArgsConstructor
 @Service
 public class UserService {
 
@@ -24,12 +25,6 @@ public class UserService {
     private final SegmentRepository segmentRepository;
     private final UserSegmentRepository userSegmentRepository;
 
-    @Autowired
-    public UserService(UserRepository userRepository, SegmentRepository segmentRepository, UserSegmentRepository userSegmentRepository) {
-        this.userRepository = userRepository;
-        this.segmentRepository = segmentRepository;
-        this.userSegmentRepository = userSegmentRepository;
-    }
 //新增使用者
     public User createUser(User user) {
         return userRepository.save(user);

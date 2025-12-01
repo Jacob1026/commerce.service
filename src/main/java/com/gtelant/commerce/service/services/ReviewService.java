@@ -10,6 +10,7 @@ import com.gtelant.commerce.service.models.User;
 import com.gtelant.commerce.service.repositories.ProductRepository;
 import com.gtelant.commerce.service.repositories.ReviewRepository;
 import com.gtelant.commerce.service.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+@RequiredArgsConstructor
 @Service
 public class ReviewService {
     private final ReviewRepository reviewRepository;
@@ -29,16 +30,6 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final ReviewMapper reviewMapper;
 
-    @Autowired
-    public ReviewService(ReviewRepository reviewRepository,
-                         ProductRepository productRepository,
-                         UserRepository userRepository,
-                         ReviewMapper reviewMapper) {
-        this.reviewRepository = reviewRepository;
-        this.productRepository = productRepository;
-        this.userRepository = userRepository;
-        this.reviewMapper = reviewMapper;
-    }
 
     // 新增評論
     @Transactional
