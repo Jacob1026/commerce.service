@@ -8,6 +8,7 @@ import com.gtelant.commerce.service.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/products")
 @CrossOrigin("*")
@@ -27,11 +28,6 @@ public class ProductController {
     private final ProductService productService;
     private final ProductMapper productMapper;
 
-    @Autowired
-    public ProductController(ProductService productService, ProductMapper productMapper) {
-        this.productService = productService;
-        this.productMapper = productMapper;
-    }
 
     @Operation(summary = "新增商品", description = "建立一個新商品並指定其分類")
     @PostMapping

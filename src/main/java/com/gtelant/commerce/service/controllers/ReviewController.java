@@ -8,6 +8,7 @@ import com.gtelant.commerce.service.services.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*; // 引入 @RequestBody
 import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/reviews")
 @CrossOrigin("*")
@@ -23,12 +25,8 @@ import java.util.List;
 @Tag(name = "Review", description = "Review management APIs")
 
 public class ReviewController {
-    private final ReviewService reviewService;
 
-    @Autowired
-    public ReviewController(ReviewService reviewService) {
-        this.reviewService = reviewService;
-    }
+    private final ReviewService reviewService;
 
     @Operation(summary = "新增顧客評論", description = "一個顧客評論一個商品")
     @PostMapping

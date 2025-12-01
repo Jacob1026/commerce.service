@@ -6,22 +6,20 @@ import com.gtelant.commerce.service.dtos.UserRequest;
 import com.gtelant.commerce.service.mappers.UserMapper;
 import com.gtelant.commerce.service.models.User;
 import com.gtelant.commerce.service.services.JwtAuthService;
-import com.gtelant.commerce.service.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/jwt")
 
 public class JwtAuthController {
-    @Autowired
+
     private UserMapper userMapper;
-    @Autowired
     private JwtAuthService jwtAuthService;
 
     @PostMapping("/register")
