@@ -3,6 +3,7 @@ package com.gtelant.commerce.service.services;
 import com.gtelant.commerce.service.dtos.ReviewRequest;
 import com.gtelant.commerce.service.dtos.ReviewResponse;
 import com.gtelant.commerce.service.enums.ReviewStatus;
+import com.gtelant.commerce.service.exceptions.ResourceNotFoundException;
 import com.gtelant.commerce.service.mappers.ReviewMapper;
 import com.gtelant.commerce.service.models.Product;
 import com.gtelant.commerce.service.models.Review;
@@ -34,20 +35,27 @@ public class ReviewService {
     // 新增評論
     @Transactional
     public ReviewResponse createReview(ReviewRequest request) {
+        // 驗證商品是否存在
         Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new RuntimeException("找不到對應的商品，ID: " + request.getProductId()));
+                .orElseThrow(() -> new ResourceNotFoundException("商品不存在 ID: " + request.getProductId()));
 
+        // 驗證使用者是否存在
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("找不到對應的用戶，ID: " + request.getUserId()));
+                .orElseThrow(() -> new ResourceNotFoundException("使用者不存在 ID: " + request.getUserId()));
 
+        // 轉換 Entity 並設定關聯
         Review review = reviewMapper.toReview(request);
-
         review.setProduct(product);
         review.setUser(user);
-        review.setReviewStatus(ReviewStatus.PENDING);
 
+        // 設定預設值 (與批次新增邏輯保持一致)
+        review.setCreatedAt(LocalDateTime.now());
+        if (review.getReviewStatus() == null) {
+            review.setReviewStatus(ReviewStatus.PENDING);
+        }
+
+        // 存檔並轉換回 DTO
         Review savedReview = reviewRepository.save(review);
-
         return reviewMapper.toReviewResponse(savedReview);
     }
 
@@ -65,7 +73,7 @@ public class ReviewService {
         if (!productRepository.existsById(productId)) {
             throw new RuntimeException("找不到對應的商品，ID: " + productId);
         }
-        Page<Review> reviewPage = reviewRepository.findById(productId, pageable);
+        Page<Review> reviewPage = reviewRepository.findByProductId(productId, pageable);
         return reviewPage.map(reviewMapper::toReviewResponse);
     }
 

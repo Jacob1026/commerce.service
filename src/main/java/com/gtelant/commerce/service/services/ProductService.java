@@ -74,23 +74,15 @@ public class ProductService {
             }
             //庫存查詢
 
-            if (stockFrom != null && stockTo == null) {
-                // WHERE stock >= stockFrom
+            if (stockFrom != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("stock"), stockFrom));
-
-            }else if (stockFrom == null && stockTo != null) {
-                // WHERE stock <= stockTo
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("stock"), stockTo));
-
-            } else if (stockFrom != null && stockTo != null) {
-                // WHERE stock >= stockFrom
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("stock"), stockFrom));
-                // WHERE stock <= stockTo
+            }
+            if (stockTo != null) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("stock"), stockTo));
             }
-
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
+
         return productRepository.findAll(spec, pageable);
     }
 }

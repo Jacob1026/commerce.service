@@ -1,8 +1,9 @@
 package com.gtelant.commerce.service.services;
 
 import com.gtelant.commerce.service.exceptions.ResourceNotFoundException;
-import com.gtelant.commerce.service.mappers.ProductMapper;
+import com.gtelant.commerce.service.models.Category;
 import com.gtelant.commerce.service.models.Product;
+import com.gtelant.commerce.service.repositories.CategoryRepository;
 import com.gtelant.commerce.service.repositories.ProductRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,51 +12,68 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
 
     @Mock
     private ProductRepository productRepository;
-
     @Mock
-    private ProductMapper productMapper;
+    private CategoryRepository categoryRepository;
 
     @InjectMocks
     private ProductService productService;
 
     @Test
-    @DisplayName("getProduct: 應在資源存在時返回 DTO")
+    @DisplayName("getProductById: 成功時應回傳 Product")
     void getProduct_Success() {
-        // Arrange
-        Product product = new Product(1L, "Laptop", BigDecimal.TEN);
-        ProductDTO dto = new ProductDTO(1L, "Laptop");
+        Product product = new Product();
+        product.setId(1);
+        product.setName("Laptop");
 
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-        when(productMapper.toDTO(product)).thenReturn(dto);
+        when(productRepository.findById(1)).thenReturn(Optional.of(product));
 
-        // Act
-        ProductDTO result = productService.getProduct(1L);
-
-        // Assert
-        assertEquals(dto, result);
-        verify(productRepository).findById(1L);
+        Product result = productService.getProductById(1);
+        assertNotNull(result);
+        assertEquals("Laptop", result.getName());
     }
 
     @Test
-    @DisplayName("getProduct: 應在資源不存在時拋出 ResourceNotFoundException")
+    @DisplayName("getProductById: 找不到時應拋出 ResourceNotFoundException")
     void getProduct_NotFound() {
-        // Arrange
-        when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(productRepository.findById(999)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> productService.getProduct(999L));
+        assertThrows(ResourceNotFoundException.class, () -> productService.getProductById(999));
+    }
 
-        // 確保 Mapper 沒有被呼叫，因為流程在 findById 後就中斷了
-        verifyNoInteractions(productMapper);
+    @Test
+    @DisplayName("createProduct: 分類存在時應成功儲存")
+    void createProduct_Success() {
+        Product product = new Product();
+        Category category = new Category();
+        category.setId(1);
+
+        when(categoryRepository.findById(1)).thenReturn(Optional.of(category));
+        when(productRepository.save(any(Product.class))).thenReturn(product);
+
+        Product result = productService.createProduct(product, 1);
+        assertNotNull(result);
+        verify(productRepository).save(product);
+    }
+
+    @Test
+    @DisplayName("createProduct: 分類不存在時應拋出異常")
+    void createProduct_CategoryNotFound() {
+        when(categoryRepository.findById(999)).thenReturn(Optional.empty());
+        Product product = new Product();
+
+        assertThrows(ResourceNotFoundException.class, () -> productService.createProduct(product, 999));
+        verify(productRepository, never()).save(any());
     }
 }

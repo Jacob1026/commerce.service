@@ -1,11 +1,16 @@
 package com.gtelant.commerce.service.services;
 
+import com.gtelant.commerce.service.dtos.AuthResponse;
+import com.gtelant.commerce.service.dtos.LoginRequest;
 import com.gtelant.commerce.service.models.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.security.Key;
