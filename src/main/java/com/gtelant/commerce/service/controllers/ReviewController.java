@@ -3,18 +3,17 @@ package com.gtelant.commerce.service.controllers;
 import com.gtelant.commerce.service.dtos.ReviewRequest;
 import com.gtelant.commerce.service.dtos.ReviewResponse; // <-- 修改返回類型
 import com.gtelant.commerce.service.dtos.UpdateReviewStatusRequest;
-import com.gtelant.commerce.service.models.Review;
+
 import com.gtelant.commerce.service.services.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*; // 引入 @RequestBody
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor

@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 public class JwtAuthController {
 
-    private UserMapper userMapper;
-    private JwtAuthService jwtAuthService;
+    private final UserMapper userMapper;
+    private final JwtAuthService jwtAuthService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse>register(@RequestBody UserRequest userRequest){
