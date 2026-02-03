@@ -1,5 +1,6 @@
 package com.gtelant.commerce.service.services;
 
+import com.gtelant.commerce.service.exceptions.ResourceNotFoundException;
 import com.gtelant.commerce.service.models.Segment;
 import com.gtelant.commerce.service.models.User;
 import com.gtelant.commerce.service.models.UserSegment;
@@ -59,14 +60,6 @@ public class UserService {
                 //透過 Join 來連接 User 和 UserSegment資料表
                 Join<User , UserSegment> userUserSegmentJoin = root.join("userSegments");// userSegments
                 predicates.add(criteriaBuilder.equal(userUserSegmentJoin.get("segment").get("id"), segmentId));
-
-                //如果 userSegment有 屬性segmentId 則可以直接使用
-                //predicates.add(criteriaBuilder.equal(userUserSegmentJoin.get("segmentId"), segmentId));
-
-                //如果欲查詢Segment參數為字串（name）=> segmentName
-                //predicates.add(criteriaBuilder.equal(userUserSegmentJoin.get("segment").get("name"), segmentName)
-
-                //
             }
             Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
             return criteriaBuilder.and(predicateArray);
@@ -75,44 +68,44 @@ public class UserService {
 
 //用ID去找使用者
     public User getUserById(Integer id) {
-        return userRepository.findById(id).orElse(null);
-    }
+        return userRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("找不到使用者 ID: " + id));
+}
 //更新使用者
     public User updateUser(Integer id, User updatedUser) {
-        if (userRepository.existsById(id)) {
-            updatedUser.setId(id);
-            return userRepository.save(updatedUser);
-        }
-        return null;
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("無法更新，找不到使用者 ID: " + id);
     }
+        updatedUser.setId(id);
+        return userRepository.save(updatedUser);
+}
 //刪除使用者
-    public boolean deleteUser(Integer id) {
-        if (userRepository.existsById(id)) {
-            userRepository.deleteById(id);
-            return true;
-        }
-        return false;
+    public void deleteUser(Integer id) {
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("無法刪除，找不到使用者 ID: " + id);
     }
+        userRepository.deleteById(id);
+}
 
     //新增使用者到某個Segment
     public UserSegment addUserToSegment(int id, int segmentId) {
-        Optional<User> user = userRepository.findById(id);
-        Optional<Segment> segment = segmentRepository.findById(segmentId);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("使用者不存在 ID: " + id));
+        Segment segment = segmentRepository.findById(segmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("標籤(Segment)不存在 ID: " + segmentId));
 
-        if (user.isPresent() && segment.isPresent()) {
-            UserSegment userSegment = new UserSegment();
-            userSegment.setUser(user.get());
-            userSegment.setSegment(segment.get());
-            userSegment.setCreatedAt(java.time.LocalDateTime.now());
-            userSegmentRepository.save(userSegment);
-            return null;
-        }
-        return null;
+        UserSegment userSegment = new UserSegment();
+        userSegment.setUser(user);
+        userSegment.setSegment(segment);
+        userSegment.setCreatedAt(java.time.LocalDateTime.now());
+        return userSegmentRepository.save(userSegment);
     }
 //用 userId 查詢使用者的 segment
     public List<UserSegment> getUserSegmentsByUserId(int userId) {
-        return userSegmentRepository.findByUserId(userId);
+        if (!userRepository.existsById(userId)) {
+            throw new ResourceNotFoundException("使用者不存在 ID: " + userId);
     }
-
+        return userSegmentRepository.findByUserId(userId);
+}
 
 }
