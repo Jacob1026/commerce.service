@@ -1,20 +1,20 @@
 package com.gtelant.commerce.service.services;
 
+import com.gtelant.commerce.service.exceptions.ResourceNotFoundException;
 import com.gtelant.commerce.service.models.Category;
 import com.gtelant.commerce.service.models.Product;
 import com.gtelant.commerce.service.repositories.CategoryRepository;
 import com.gtelant.commerce.service.repositories.ProductRepository;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 public class ProductService {
@@ -23,54 +23,40 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
 
 
-    /**
-     * 新增商品，並處理與分類的關聯
-     */
+    //新增商品
     public Product createProduct(Product product, Integer categoryId) {
-        // 根據 categoryId 尋找 Category Entity
-        Optional<Category> category = categoryRepository.findById(categoryId);
-        if (category.isEmpty()) {
-            // 如果找不到對應的分類，可以拋出例外或回傳 null
-            // 這裡我們回傳 null，讓 Controller 去處理後續
-            return null;
-        }
-        // 建立商品與分類的關聯
-        product.setCategory(category.get());
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("分類不存在，ID: " + categoryId));
+
+        product.setCategory(category);
         return productRepository.save(product);
     }
 
-    /**
-     * 更新商品資訊
-     */
+    //更新商品
     public Product updateProduct(Integer productId, Product productDetails, Integer categoryId) {
-        if (!productRepository.existsById(productId)) {
-            return null; // 商品不存在
-        }
-        Optional<Category> category = categoryRepository.findById(categoryId);
-        if (category.isEmpty()) {
-            return null; // 分類不存在
-        }
-        productDetails.setId(productId); // 確保更新的是正確的商品
-        productDetails.setCategory(category.get());
+        Product existingProduct = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("商品不存在，ID: " + productId));
+
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("分類不存在，ID: " + categoryId));
+
+        productDetails.setId(existingProduct.getId());
+        productDetails.setCategory(category);
         return productRepository.save(productDetails);
     }
 
-    /**
-     * 刪除商品
-     */
-    public boolean deleteProduct(Integer productId) {
-        if (productRepository.existsById(productId)) {
-            productRepository.deleteById(productId);
-            return true;
+   //刪除商品
+    public void deleteProduct(Integer productId) {
+        if (!productRepository.existsById(productId)) {
+            throw new ResourceNotFoundException("無法刪除，商品不存在，ID: " + productId);
         }
-        return false;
+        productRepository.deleteById(productId);
     }
 
-    /**
-     * 根據 ID 查詢單一商品
-     */
+    //根據 ID 查詢單一商品
     public Product getProductById(Integer productId) {
-        return productRepository.findById(productId).orElse(null);
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("商品不存在，ID: " + productId));
     }
 
     //條件查詢

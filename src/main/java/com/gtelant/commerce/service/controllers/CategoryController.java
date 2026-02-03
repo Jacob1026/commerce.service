@@ -1,6 +1,6 @@
 package com.gtelant.commerce.service.controllers;
 
-import com.gtelant.commerce.service.dtos.ApiResponse; // 1. 引入 ApiResponse
+import com.gtelant.commerce.service.dtos.ApiResponse;
 import com.gtelant.commerce.service.dtos.CategoryRequest;
 import com.gtelant.commerce.service.dtos.CategoryResponse;
 import com.gtelant.commerce.service.mappers.CategoryMapper;
@@ -9,7 +9,7 @@ import com.gtelant.commerce.service.services.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid; // 2. 引入驗證註解 (Spring Boot 3.x 使用 jakarta，若是 2.x 用 javax)
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,7 +58,6 @@ public class CategoryController {
         List<CategoryResponse> responseList = categoryService.getAllCategories().stream()
                 .map(categoryMapper::toCategoryResponse)
                 .toList();
-        // 使用 ApiResponse.success 包裝 List
         return ResponseEntity.ok(ApiResponse.success(responseList));
     }
 
@@ -68,7 +67,6 @@ public class CategoryController {
     public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(@PathVariable int id, @Valid @RequestBody CategoryRequest categoryRequest) {
         Category categoryToUpdate = categoryMapper.toCategory(categoryRequest);
         Category updatedCategory = categoryService.updateCategory(id, categoryToUpdate);
-        // 使用 ApiResponse.success 包裝
         return ResponseEntity.ok(ApiResponse.success(categoryMapper.toCategoryResponse(updatedCategory)));
     }
 
@@ -77,9 +75,6 @@ public class CategoryController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable int id) {
         categoryService.deleteCategory(id);
-        // 刪除成功通常回傳 204 (No Content)，這時 Body 是空的，所以不需要 ApiResponse
-        // 但如果你想回傳 "操作成功" 的訊息，可以改用 200 OK 並回傳 ApiResponse.success(null)
-        // 這裡維持標準 REST 風格回傳 204：
         return ResponseEntity.noContent().build();
     }
 }
